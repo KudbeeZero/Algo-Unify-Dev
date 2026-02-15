@@ -1,29 +1,29 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   walletAddress: text("wallet_address").unique().notNull(),
   budBalance: text("bud_balance").default("0"),
   terpBalance: text("terp_balance").default("0"),
   lastSeenAnnouncementId: integer("last_seen_announcement_id"),
-  lastLogin: timestamp("last_login").defaultNow(),
-  createdAt: timestamp("created_at").defaultNow(),
+  lastLogin: text("last_login").$defaultFn(() => new Date().toISOString()),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 
-export const playerStats = pgTable("player_stats", {
-  id: serial("id").primaryKey(),
+export const playerStats = sqliteTable("player_stats", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   walletAddress: text("wallet_address").unique().notNull(),
   totalHarvests: integer("total_harvests").default(0).notNull(),
   totalBudEarned: text("total_bud_earned").default("0").notNull(),
   totalTerpEarned: text("total_terp_earned").default("0").notNull(),
   rareTerpenesFound: integer("rare_terpenes_found").default(0).notNull(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedAt: text("updated_at").$defaultFn(() => new Date().toISOString()),
 });
 
-export const songs = pgTable("songs", {
-  id: serial("id").primaryKey(),
+export const songs = sqliteTable("songs", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   artist: text("artist").notNull(),
   objectPath: text("object_path").notNull(),
@@ -31,26 +31,26 @@ export const songs = pgTable("songs", {
   genre: text("genre").default("chill"),
   coverArt: text("cover_art"),
   playCount: integer("play_count").default(0).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 
-export const announcementVideos = pgTable("announcement_videos", {
-  id: serial("id").primaryKey(),
+export const announcementVideos = sqliteTable("announcement_videos", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   objectPath: text("object_path").notNull(),
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  isActive: integer("is_active", { mode: "boolean" }).default(true).notNull(),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 
 // Seed Bank - Special seeds with custom attributes
-export const seedBank = pgTable("seed_bank", {
-  id: serial("id").primaryKey(),
+export const seedBank = sqliteTable("seed_bank", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   description: text("description").notNull(),
   rarity: text("rarity").notNull().default("common"), // common, uncommon, rare, legendary, mythic
-  terpeneProfile: jsonb("terpene_profile").$type<string[]>().default([]),
-  effects: jsonb("effects").$type<string[]>().default([]),
-  flavorNotes: jsonb("flavor_notes").$type<string[]>().default([]),
+  terpeneProfile: text("terpene_profile", { mode: "json" }).$type<string[]>().default([]),
+  effects: text("effects", { mode: "json" }).$type<string[]>().default([]),
+  flavorNotes: text("flavor_notes", { mode: "json" }).$type<string[]>().default([]),
   thcRange: text("thc_range").default("15-20%"),
   cbdRange: text("cbd_range").default("0-1%"),
   growthBonus: integer("growth_bonus").default(0), // Percentage bonus to yields
@@ -60,17 +60,17 @@ export const seedBank = pgTable("seed_bank", {
   totalSupply: integer("total_supply"), // null = unlimited
   mintedCount: integer("minted_count").default(0).notNull(),
   maxPerUser: integer("max_per_user").default(1), // limit per wallet, null = unlimited
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  isActive: integer("is_active", { mode: "boolean" }).default(true).notNull(),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 
 // User's owned seeds from seed bank
-export const userSeeds = pgTable("user_seeds", {
-  id: serial("id").primaryKey(),
+export const userSeeds = sqliteTable("user_seeds", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   walletAddress: text("wallet_address").notNull().references(() => users.walletAddress),
   seedId: integer("seed_id").notNull().references(() => seedBank.id),
   quantity: integer("quantity").default(1).notNull(),
-  purchasedAt: timestamp("purchased_at").defaultNow(),
+  purchasedAt: text("purchased_at").$defaultFn(() => new Date().toISOString()),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, lastLogin: true });
