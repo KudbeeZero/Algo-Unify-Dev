@@ -324,7 +324,7 @@ export function MiniPlayer() {
                                     contentType: file.type,
                                   }),
                                 });
-                                const { uploadURL, objectPath } = await res.json();
+                                const { uploadURL, objectPath } = await res.json() as { uploadURL: string; objectPath: string };
                                 // Store path in ref - don't set state yet (upload not complete)
                                 pendingUploadPath.current = objectPath;
                                 return {

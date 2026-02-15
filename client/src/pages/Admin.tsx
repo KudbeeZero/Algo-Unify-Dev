@@ -157,7 +157,6 @@ export default function Admin() {
       body: JSON.stringify({
         name: file.name,
         contentType: file.type,
-        size: file.size || 0,
       }),
     });
 
@@ -165,7 +164,7 @@ export default function Admin() {
       throw new Error("Failed to get upload URL");
     }
 
-    const data = await res.json();
+    const data = await res.json() as { uploadURL: string; objectPath: string };
     pendingUploadPath.current = data.objectPath;
 
     return {
