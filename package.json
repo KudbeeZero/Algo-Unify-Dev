@@ -10,7 +10,28 @@
     "check": "tsc",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply growpod-empire-db --local",
-    "db:migrate:remote": "wrangler d1 migrations apply growpod-empire-db --remote"
+    "db:migrate:remote": "wrangler d1 migrations apply growpod-empire-db --remote",
+
+    "contracts:build": "cd smart_contracts/projects/smart_contracts && npm run build",
+    "contracts:test": "cd smart_contracts/projects/smart_contracts && npm run test",
+    "contracts:lint": "cd smart_contracts/projects/smart_contracts && npm run lint",
+    "contracts:lint:fix": "cd smart_contracts/projects/smart_contracts && npm run lint:fix",
+    "contracts:format": "cd smart_contracts/projects/smart_contracts && npm run format",
+    "contracts:check-types": "cd smart_contracts/projects/smart_contracts && npm run check-types",
+    "contracts:audit-teal": "cd smart_contracts/projects/smart_contracts && npm run audit-teal",
+    "contracts:deploy:testnet": "cd smart_contracts/projects/smart_contracts && algokit deploy testnet",
+    "contracts:deploy:mainnet": "cd smart_contracts/projects/smart_contracts && algokit deploy mainnet",
+    "contracts:localnet:start": "cd smart_contracts/projects/smart_contracts && algokit localnet start",
+    "contracts:localnet:stop": "cd smart_contracts/projects/smart_contracts && algokit localnet stop",
+    "contracts:localnet:reset": "cd smart_contracts/projects/smart_contracts && algokit localnet reset",
+
+    "build": "npm run contracts:build && vite build",
+    "test": "npm run contracts:test",
+    "lint": "npm run contracts:lint",
+    "lint:fix": "npm run contracts:lint:fix",
+    "format": "npm run contracts:format",
+    "deploy:testnet": "npm run contracts:deploy:testnet",
+    "deploy:localnet": "cd smart_contracts/projects/smart_contracts && algokit deploy localnet"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

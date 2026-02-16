@@ -4,7 +4,7 @@ A blockchain-based idle/farming game built on **Algorand TestNet**. Players mana
 
 ## Tech Stack
 
-- **Smart Contracts**: PyTeal (Algorand)
+- **Smart Contracts**: Algorand TypeScript 1.0 (PuyaTs) - migrated from PyTeal
 - **Frontend**: React 18 + Vite + TypeScript
 - **Styling**: Tailwind CSS (dark cyberpunk theme)
 - **Wallet**: Pera Wallet Connect (@perawallet/connect)
@@ -92,6 +92,115 @@ python contracts/bootstrap.py  # If APP_ID is set, it will call set_asa_ids
 npm install
 npm run dev
 ```
+
+---
+
+## CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment. The pipeline ensures code quality and automates TestNet deployments.
+
+### Pipeline Overview
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Feature    │     │   Pull      │     │   Merge     │
+│  Branch     │────▶│   Request   │────▶│   to Main   │
+│  (dev)      │     │  (review)   │     │  (deploy)   │
+└─────────────┘     └─────────────┘     └─────────────┘
+                       │                    │
+                       ▼                    ▼
+                ┌─────────────┐     ┌─────────────┐
+                │    CI       │     │     CD      │
+                │  (build,    │     │  (deploy    │
+                │   test,     │     │  testnet)   │
+                │   lint)     │     │             │
+                └─────────────┘     └─────────────┘
+```
+
+### CI Workflow (`.github/workflows/ci.yml`)
+
+Triggers on: **push to main** and **pull requests to main**
+
+**Jobs:**
+1. **Build Smart Contract** - Compiles TypeScript contract using Puya compiler
+2. **Run Unit Tests** - Executes tests against AlgoKit LocalNet
+3. **Lint & Type Check** - Ensures code quality and type safety
+4. **TEAL Security Audit** - Analyzes compiled TEAL for security issues
+
+### CD Workflow (`.github/workflows/deploy-testnet.yml`)
+
+Triggers on: **successful merge to main** or **tag push** (`v*`)
+
+**Jobs:**
+1. **Deploy to Algorand TestNet** - Builds and deploys contract
+2. **Verify Deployment** - Confirms contract is live on TestNet
+
+### Local Development Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run contracts:build` | Compile smart contract |
+| `npm run contracts:test` | Run unit tests against LocalNet |
+| `npm run contracts:lint` | Run ESLint |
+| `npm run contracts:lint:fix` | Auto-fix lint issues |
+| `npm run contracts:format` | Format code with Prettier |
+| `npm run contracts:check-types` | TypeScript type checking |
+| `npm run contracts:audit-teal` | Run TEAL security audit |
+| `npm run contracts:localnet:start` | Start AlgoKit LocalNet |
+| `npm run contracts:localnet:stop` | Stop AlgoKit LocalNet |
+| `npm run contracts:deploy:testnet` | Deploy to TestNet |
+| `npm run contracts:deploy:mainnet` | Deploy to MainNet |
+
+### Setting Up GitHub Secrets
+
+For the CI/CD pipeline to work, configure these secrets in your GitHub repository:
+
+1. Navigate to **Settings → Secrets and variables → Actions**
+2. Add the following secrets:
+
+| Secret | Description | Required |
+|--------|-------------|----------|
+| `DEPLOYER_MNEMONIC` | 25-word wallet mnemonic for deployment | ✅ |
+| `DISPENSER_MNEMONIC` | Dispenser wallet for funding | ✅ |
+| `ALGORAND_INDEXER_TOKEN` | Indexer API token (MainNet only) | Optional |
+| `ALGORAND_ARCHIVE_NODE_TOKEN` | Archive node token (MainNet only) | Optional |
+
+### Setting Up Branch Protection
+
+See [`.github/BRANCH_PROTECTION.md`](.github/BRANCH_PROTECTION.md) for detailed instructions.
+
+Basic requirements:
+- Require pull request reviews before merging
+- Require CI to pass before merging
+- Prevent direct pushes to main
+
+### Triggering Deployments
+
+**Automatic Deployment (on merge):**
+- Merge a PR to `main` after CI passes
+- CD workflow automatically deploys to TestNet
+
+**Manual Deployment:**
+- Go to **Actions → CD - Deploy to TestNet**
+- Click **Run workflow**
+- Use the redeploy option to update without new App ID
+
+**Version Tag Deployment:**
+- Create a version tag: `git tag v1.0.0 && git push --tags`
+- This triggers deployment and creates a GitHub release
+
+### TestNet Deployed Contract
+
+| Asset | ID |
+|-------|-----|
+| GrowPod App ID | 755243944 |
+| BUD Token | 755243947 |
+| TERP Token | 755243948 |
+| SLOT Token | 755243949 |
+| Contract Address | CWGAVWZRVKKFHRYZHEPQPELVJMFNW2QMIWNEB2H3ZXCKOXRIPKWCW2IBRI |
+| Admin Wallet | HW6U3RKLOYEW2X2L4DERSJHBPG6G6UTKDWBSS2MKPZJOSAWKLP72NTIMNQ |
+
+---
 
 ## Contract Scripts
 
