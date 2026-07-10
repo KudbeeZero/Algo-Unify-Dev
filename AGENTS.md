@@ -139,3 +139,12 @@ algokit project deploy localnet # Deploy to localnet
 | Puya compiler errors | Load `algorand-typescript` skill |
 
 </troubleshooting>
+
+## Cross-References for All Agents
+
+**Always reference these files when planning work:**
+- `docs/RATE_LIMIT_DEFENSE.md` — Rate limit prevention and efficient "mechanic philosophy" workflow (do related work while already in context to reduce token burn).
+- `CLAUDE.md` for general instructions.
+- Relevant skill files in the skills table above.
+
+Any agent should load `docs/RATE_LIMIT_DEFENSE.md` before starting complex or long-running tasks.
